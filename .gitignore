@@ -1,0 +1,5 @@
+.DS_Store
+*.tmp
+~$*.xlsx
+*.xlsx
+scripts/__pycache__/
