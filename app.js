@@ -189,10 +189,13 @@ async function openSearch(){
 function filteredTransactions(){return selectedPeriods.flatMap(period=>transactions[period]||[]).filter(t=>!t.date&&(!selectedCard||t.card===selectedCard)&&(!selectedTypes.length||selectedTypes.includes(t.type)))}
 function cardOptions(){return [...new Set(Object.values(transactions).flat().filter(t=>t.card).map(t=>t.card))]}
 function cardLabel(card){return card.replace(/(\d{4})(?=\d|\*)/g,'$1 ').replace(/(\*{4})(?=\*|\d)/g,'$1 ')}
-function renderSearch(){const list=searchResults=filteredTransactions(); app.innerHTML=`<div class="page search-page">${topbar('查找交易',false,'goBack()','back0')}<div class="search-tools"><button class="drop ${selectedPeriods.length?'':''}" onclick="openPeriod()">${periodLabel()}${icon('triangle','tiny-arrow')}</button><button class="drop" onclick="openFilter()">筛选${icon('triangle','tiny-arrow')}</button></div><form class="search-box" onsubmit="event.preventDefault();searchTransactions(this.elements.query.value)"><button type="submit" aria-label="搜索">${icon('search0')}</button><input name="query" type="search" placeholder="输入关键词或交易金额查找" onfocus="clearSearchResults()"></form><main class="search-list" id="searchList">${searchTxHTML(list)}</main><div id="sheet"></div></div>`}
+function renderSearch(){const list=searchResults=filteredTransactions(); app.innerHTML=`<div class="page search-page">${topbar('查找交易',false,'goBack()','back0')}<div class="search-tools"><button class="drop ${selectedPeriods.length?'':''}" onclick="openPeriod()">${periodLabel()}${icon('triangle','tiny-arrow')}</button><button class="drop" onclick="openFilter()">筛选${icon('triangle','tiny-arrow')}</button></div><div class="search-row"><form class="search-box" onsubmit="event.preventDefault();searchTransactions(this.elements.query.value)"><button type="submit" aria-label="搜索">${icon('search0')}</button><input name="query" type="search" placeholder="输入关键词或交易金额查找" onfocus="focusSearch()"><button class="search-clear" type="button" aria-label="清空" onclick="clearSearchInput(this)">${icon('x','search-clear-icon')}</button></form><button class="search-cancel" type="button" onclick="cancelSearch()">取消</button></div><main class="search-list" id="searchList">${searchTxHTML(list)}</main><div id="sheet"></div></div>`}
 function searchText(value){return String(value).toLowerCase().replace(/[\s,¥￥]/g,'')}
 function searchTxHTML(list){return list.map((t,i)=>({t,i})).filter(x=>!x.t.date).map(({t,i})=>`<div class="search-tx" data-text="${searchText(`${t.merchant} ${t.amount}`)}" onclick="showSearchDetail(${i})"><div><div class="merchant">${t.merchant}</div><small>${t.tail}</small></div><div><strong class="${amountClass(t)}">${t.amount}</strong><small>${t.time}</small></div></div>`).join('')}
 function showSearchDetail(i){showDetailObject(searchResults[i])}
+function focusSearch(){document.querySelector('.search-page')?.classList.add('searching');clearSearchResults()}
+function clearSearchInput(button){button.previousElementSibling.value='';cancelSearch()}
+function cancelSearch(){const page=document.querySelector('.search-page'),list=page?.querySelector('#searchList');page?.classList.remove('searching');if(list){searchResults=filteredTransactions();list.innerHTML=searchTxHTML(searchResults);list.style.minHeight=''}}
 function clearSearchResults(){const list=document.querySelector('#searchList');if(list){list.style.minHeight=`${list.offsetHeight}px`;list.innerHTML=''}}
 async function searchTransactions(query){
   const page=document.querySelector('.search-page');
@@ -206,6 +209,7 @@ async function searchTransactions(query){
   const list=page.querySelector('#searchList');
   list.innerHTML=searchTxHTML(searchResults);
   list.style.minHeight='';
+  page.classList.remove('searching');
   page.querySelector('.bill-loading-mask')?.remove();
 }
 async function showDetailObject(t){
