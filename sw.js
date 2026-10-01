@@ -1,5 +1,5 @@
-const CACHE='bill-demo-v22';
-const ASSETS=['./','./index.html','./style.css','./app.js','./manifest.json','./assets/bills-data.js','./assets/loading.gif','./assets/logo.png','./assets/back.png','./assets/back0.png','./assets/more.png','./assets/more0.png','./assets/search.png','./assets/search0.png','./assets/triangle.png','./assets/triangle-up.png','./assets/arrow-down.png','./assets/arrow-right.png','./assets/up.png','./assets/down.png','./assets/info.png','./assets/merchant.png','./icons/icon-192.png','./icons/icon-512.png'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('bill-demo-')&&key!==CACHE).map(key=>caches.delete(key))))));
+const CACHE='bill-demo-v38';
+const ASSETS=['./','./index.html','./style.css','./app.js','./manifest.json','./assets/bills-data.js','./assets/loading.gif','./assets/logo.png','./assets/back.png','./assets/back0.png','./assets/more.png','./assets/more0.png','./assets/search.png','./assets/search0.png','./assets/triangle.png','./assets/triangle-up.png','./assets/triangle-down.png','./assets/arrow-down.png','./assets/arrow-right.png','./assets/up.png','./assets/down.png','./assets/info.png','./assets/merchant.png','./assets/bill-header-bg.png','./assets/card1.png','./assets/card2.png','./assets/seasonal-promo.png','./assets/select.png','./icons/icon-192.png','./icons/icon-512.png'];
+self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('bill-demo-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));

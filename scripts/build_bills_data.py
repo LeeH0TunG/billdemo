@@ -14,7 +14,7 @@ for row in sheet.iter_rows(min_row=2, values_only=True):
     item = dict(zip(headers, row))
     if item["账单月份"] and item["人民币金额"] is not None: months[item["账单月份"]].append(item)
 def money(value): return f"¥ {'-' if value < 0 else ''}{abs(value):,.2f}"
-ordered = sorted(months, reverse=True); totals = {month: sum(item["人民币金额"] for item in rows) for month, rows in months.items()}; transactions = {}; bills = []; last_year = None
+ordered = sorted(months, reverse=True); totals = {month: sum(item["人民币金额"] for item in rows if item["交易类型"] != "还款") for month, rows in months.items()}; transactions = {}; bills = []; last_year = None
 latest = next(month for month in ordered if month != "预估未出账单")
 for index, month in enumerate(ordered):
     pending = month == "预估未出账单"

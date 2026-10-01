@@ -7,6 +7,10 @@ for (const file of ['assets/bills-data.js', 'app.js']) vm.runInContext(fs.readFi
 const data = context.window.billDemoData;
 assert(data.transactions.pending.length);
 assert.equal(data.bills.find(b => b.id === 'current').title, '本期账单');
+for (const bill of data.bills.filter(b => b.id)) {
+  const total = bill.tx.filter(t => !t.date && t.type !== '还款').reduce((sum,t) => sum + Number(t.amount.replace(/[^\d.-]/g,'')),0);
+  assert.equal(bill.amount, `¥ ${total < 0 ? '-' : ''}${Math.abs(total).toLocaleString('en-US',{minimumFractionDigits:2})}`);
+}
 assert.equal(vm.runInContext("searchText(' ¥ 1,680.00 ')", context), '1680.00');
 assert(vm.runInContext("searchText('支付宝-名创优选').includes(searchText('名创优选'))", context));
 context.record = {merchant: '测试商户', amount: '¥ 1,680.00'};
